@@ -1,0 +1,97 @@
+allcorrelation <- function(data, target, uniqueid, Threshold, sign, corrmatrix){
+
+nums <- sapply(data, is.numeric)
+data1 <- data[,nums]
+data1[uniqueid] <- NULL
+data1[target] <- NULL
+col1 <- dim(data)[2]
+row1 <- dim(data)[1]
+
+ row <-  dim(data1)[1]
+   col <- dim(data1)[2]
+  corr1 <- data.frame(1:col)  
+    mean <- data.frame(1:row) 
+    SD <- data.frame(1:row) 
+    for(i in seq(from = 1, to = col, by = 1)){ mean[,i] <- sum(as.numeric(data1[,i]))/row}
+    for(j in seq(from = 1, to = col, by = 1)){ SD[j] <- sqrt(sum((data1[,j]-(mean[,j]))^2)/row)}  
+   R <- combn(col,2)  
+  for(b in seq(from = 1, to = dim(R)[2], by = 1)){ 
+           u <- R[,b][1]
+           o <- R[,b][2]
+          corr1[u,o] <- sum((data1[,u]-mean[,u])*(data1[,o]-mean[,o]))/sqrt((sum((data1[,u]-mean[,o])^2)*(sum((data1[,o]-mean[,o])^2))))
+          corr1[o,u] <- sum((data1[,u]-mean[,u])*(data1[,o]-mean[,o]))/sqrt((sum((data1[,u]-mean[,o])^2)*(sum((data1[,o]-mean[,o])^2))))
+          
+  }
+   row.names(corr1) <- names(data1)
+   names(corr1) <- names(data1)
+   corr1[is.na(corr1)] <- 1
+   out <- data.frame(variable_1 = 1, variable_2 = 1)
+   if(sign == ">"){
+   p <- 0
+   for(k in seq(from = 1, to = col, by = 1)){
+     for(d in seq(from = 1, to = col, by = 1)){
+       if(k != d & k < d){
+       if(corr1[k,d] > Threshold){
+         p <- p+1
+         q <- 1
+         r <- 2
+        out[p,q] <- colnames(corr1)[k]
+        out[p,r] <- row.names(corr1)[d]
+       }
+     }
+     }
+   }
+   }
+   if(sign == "<" ){
+     p <- 0
+     for(k in seq(from = 1, to = col, by = 1)){
+       for(d in seq(from = 1, to = col, by = 1)){
+         if(k != d & k < d){
+           if(corr1[k,d] < Threshold){
+             p <- p+1
+             q <- 1
+             r <- 2
+             out[p,q] <- colnames(corr1)[k]
+             out[p,r] <- row.names(corr1)[d]
+           }
+         }
+       }
+     }
+   }
+   if(sign == ">="){
+     p <- 0
+     for(k in seq(from = 1, to = col, by = 1)){
+       for(d in seq(from = 1, to = col, by = 1)){
+         if(k != d & k < d){
+           if(corr1[k,d] >= Threshold){
+             p <- p+1
+             q <- 1
+             r <- 2
+             out[p,q] <- colnames(corr1)[k]
+             out[p,r] <- row.names(corr1)[d]
+           }
+         }
+       }
+     }
+   }
+   if(sign == "<="){
+     p <- 0
+     for(k in seq(from = 1, to = col, by = 1)){
+       for(d in seq(from = 1, to = col, by = 1)){
+         if(k != d & k < d){
+           if(corr1[k,d] <= Threshold){
+             p <- p+1
+             q <- 1
+             r <- 2
+             out[p,q] <- colnames(corr1)[k]
+             out[p,r] <- row.names(corr1)[d]
+           }
+         }
+       }
+     }
+   }
+   print(out)
+   if(corrmatrix == TRUE){
+     corr1
+   }
+}
